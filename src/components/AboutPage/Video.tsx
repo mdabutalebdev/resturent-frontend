@@ -2,17 +2,19 @@
 
 import { useRef, useState, useEffect } from "react";
 import TitleDes from "@/components/common/TitleDes";
-
-
-
 import { IoIosPlay } from "react-icons/io";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Container from "../Container";
 import { ImCross } from "react-icons/im";
+import { useGetIntroVideoQuery, useGetFeaturesQuery } from "@/store/api/homepageApi";
+
 const Video = () => {
   const [play, setplay] = useState(false);
   const videoref = useRef<HTMLVideoElement>(null);
+
+  const { data: video } = useGetIntroVideoQuery();
+  const { data: features } = useGetFeaturesQuery();
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -68,6 +70,8 @@ const Video = () => {
     setplay(true);
   };
 
+  if (!video) return null;
+
   return (
     <div>
       <div className="relative">
@@ -81,29 +85,29 @@ const Video = () => {
           onClick={() => setplay(false)}
           className="fixed z-[-999] top-10 right-10 hidden"
         >
-          {
-            play ? <span className="text-red-600 text-2xl cursor-pointer">
+          {play && (
+            <span className="text-red-600 text-2xl cursor-pointer">
               <ImCross />
-            </span> :
-              false
-          }
+            </span>
+          )}
         </div>
       </div>
 
-      <div
-        id="video2"
-        className="z-[-999] fixed rounded-lg overflow-hidden w-[80%] !h-[80vh] opacity-0 top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%]"
-      >
-        <video ref={videoref} className="h-full w-full object-cover">
-          <source src="/video/AboutVideo.mp4" />
-        </video>
-      </div>
+      {video.video_url && (
+        <div
+          id="video2"
+          className="z-[-999] fixed rounded-lg overflow-hidden w-[80%] !h-[80vh] opacity-0 top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%]"
+        >
+          <video ref={videoref} className="h-full w-full object-cover">
+            <source src={video.video_url} />
+          </video>
+        </div>
+      )}
 
       <div
         id="video"
-        className={`relative bg-videoBg bg-no-repeat bg-cover w-full h-[690px] object-cover bg-center 
-           
-        `}
+        className="relative bg-no-repeat bg-cover w-full h-[690px] object-cover bg-center"
+        style={video.thumbnail_url ? { backgroundImage: `url(${video.thumbnail_url})` } : undefined}
       >
         <a onClick={playVideo} id="play-video" className="video-play-button">
           <span className="text-red-700 z-50 text-3xl">
@@ -111,68 +115,44 @@ const Video = () => {
           </span>
         </a>
 
-        <div className="flex items-center justify-center w-full absolute top-[65%] left-[50%] -translate-x-[50%] -translate-y-[60%]">
-          <TitleDes
-            mainTitle={"Feel the authentic & original taste from us"}
-            p1={false}
-            p2={false}
-            TitleWhite={true}
-            textCenter={true}
-          />
-        </div>
+        {video.title && (
+          <div className="flex items-center justify-center w-full absolute top-[65%] left-[50%] -translate-x-[50%] -translate-y-[60%]">
+            <TitleDes
+              mainTitle={video.title}
+              p1={false}
+              p2={false}
+              TitleWhite={true}
+              textCenter={true}
+            />
+          </div>
+        )}
       </div>
 
-      <div className="bg-white py-[80px]">
-        <Container>
-          <div className="flex items-center justify-between">
-            {/* menu1 */}
-            <div className="flex gap-x-4 max-w-[336px]">
-              <div>
-                <img src="/assets/restaurant-menu 1.png" alt="" />
-              </div>
-              <div>
-                <h5 className="font-bold text-xl text-prh2 font-montserrat capitalize">
-                  Multi Cuisine
-                </h5>
-                <p className="font-montserrat font-normal text-base text-prh leading-6 pt-3">
-                  In the new era of technology we look in the future with
-                  certainty life.
-                </p>
-              </div>
+      {features && Array.isArray(features) && features.length > 0 && (
+        <div className="bg-white py-[80px]">
+          <Container>
+            <div className="flex items-center justify-between">
+              {features.map((f: any, idx: number) => (
+                <div key={idx} className="flex gap-x-4 max-w-[336px]">
+                  {f.icon && (
+                    <div className="shrink-0">
+                      <img src={f.icon} alt="" className="h-12 w-12 object-contain" />
+                    </div>
+                  )}
+                  <div>
+                    <h5 className="font-bold text-xl text-prh2 font-montserrat capitalize">
+                      {f.title}
+                    </h5>
+                    <p className="font-montserrat font-normal text-base text-prh leading-6 pt-3">
+                      {f.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
-            {/* menu2 */}
-            <div className="flex gap-x-4 max-w-[336px]">
-              <div>
-                <img src="/assets/order.png" alt="" />
-              </div>
-              <div>
-                <h5 className="font-bold text-xl text-prh2 font-montserrat capitalize">
-                  Easy To Order
-                </h5>
-                <p className="font-montserrat font-normal text-base text-prh leading-6 pt-3">
-                  In the new era of technology we look in the future with
-                  certainty life.
-                </p>
-              </div>
-            </div>
-            {/* menu3 */}
-            <div className="flex gap-x-4 max-w-[336px]">
-              <div>
-                <img src="/assets/clock.png" alt="" />
-              </div>
-              <div>
-                <h5 className="font-bold text-xl text-prh2 font-montserrat capitalize">
-                  Fast Delivery
-                </h5>
-                <p className="font-montserrat font-normal text-base text-prh leading-6 pt-3">
-                  In the new era of technology we look in the future with
-                  certainty life.
-                </p>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </div>
+          </Container>
+        </div>
+      )}
     </div>
   );
 };

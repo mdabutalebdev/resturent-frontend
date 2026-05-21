@@ -7,6 +7,7 @@ import { FaCartPlus, FaUserCircle } from "react-icons/fa";
 import { useAppState } from "@/hooks/useAppState";
 import Link from "next/link";
 import { useGetMeQuery } from "@/store/api/authApi";
+import { useGetContactInfoQuery } from "@/store/api/homepageApi";
 import { deleteCookie, getCookie } from "@/lib/cookies";
 import { errorMessage, successMessage } from "@/lib/toast";
 import Container from "@/components/Container";
@@ -19,6 +20,7 @@ interface NavberProps {
 
 const Navber = ({ className }: NavberProps) => {
   const router = useRouter();
+  const { data: contactInfo } = useGetContactInfoQuery();
 
   const list = [
     {
@@ -131,7 +133,9 @@ const Navber = ({ className }: NavberProps) => {
       <Container className={"flex items-center justify-between"}>
 
         <Link href={'/'}>
-          <img src="/assets/logo6.png" alt="" className='w-[100px] h-[80px]' />
+          {contactInfo?.logo_url && (
+            <img src={contactInfo.logo_url} alt="Logo" className='w-[100px] h-[80px] object-contain' />
+          )}
         </Link>
 
         <div className="flex items-center">

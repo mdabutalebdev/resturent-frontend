@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useLoginMutation } from "@/store/api/authApi";
+import { useLoginMutation, useLazyGetMeQuery } from "@/store/api/authApi";
 import { errorMessage, successMessage } from "@/lib/toast";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { setCookie } from "@/lib/cookies";
@@ -13,7 +13,9 @@ const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    
     const [login, { isLoading }] = useLoginMutation();
+    const [triggerGetMe] = useLazyGetMeQuery();
 
     const handleLogin = async (el: React.FormEvent<HTMLFormElement>) => {
         el.preventDefault();
@@ -28,8 +30,23 @@ const LoginPage = () => {
                 
                 if (token) {
                     setCookie("token", token);
-                    successMessage("User logged in successfully", "top-center");
-                    router.push("/");
+                    
+                    try {
+                        const userProfile = await triggerGetMe().unwrap();
+                        const activeUser = (userProfile?.uuid || userProfile?.email) ? userProfile : (userProfile?.data?.user || userProfile?.user);
+                        const userType = (activeUser?.user_type || "").toUpperCase();
+                        
+                        if (userType === "ADMIN" || userType === "STAFF") {
+                            successMessage("User logged in successfully", "top-center");
+                            router.push("/dashboard");
+                        } else {
+                            successMessage("User logged in successfully", "top-center");
+                            router.push("/");
+                        }
+                    } catch (profileErr) {
+                        successMessage("User logged in successfully", "top-center");
+                        router.push("/");
+                    }
                 } else {
                     errorMessage("Authentication failed, token not found.", "top-left", "dark");
                 }

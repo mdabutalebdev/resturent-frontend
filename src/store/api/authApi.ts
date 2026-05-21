@@ -73,4 +73,5 @@ export const {
   useResendOtpMutation,
   useResetPasswordMutation,
   useGetMeQuery,
+  useLazyGetMeQuery,
 } = authApi;
