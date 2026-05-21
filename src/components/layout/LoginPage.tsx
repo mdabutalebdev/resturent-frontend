@@ -32,7 +32,7 @@ const LoginPage = () => {
                     setCookie("token", token);
                     
                     try {
-                        const userProfile = await triggerGetMe().unwrap();
+                        const userProfile = await triggerGetMe(undefined).unwrap();
                         const activeUser = (userProfile?.uuid || userProfile?.email) ? userProfile : (userProfile?.data?.user || userProfile?.user);
                         const userType = (activeUser?.user_type || "").toUpperCase();
                         
